@@ -3,3 +3,4 @@ datapak.make
 test.make
 bin/
 .vscode/
+.DS_Store
