@@ -4,3 +4,6 @@ test.make
 bin/
 .vscode/
 .DS_Store
+re.sh
+all.sh
+commit.sh
