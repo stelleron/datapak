@@ -12,6 +12,9 @@ project "datapak"
     objdir "bin/obj/"
 
     files {"src/datapak.cpp"}
+    includedirs {"external/"}
+    libdirs {"external/"}
+    links {"snappy"}
     
     filter "configurations:Debug"
         defines { "DEBUG" }
@@ -30,8 +33,9 @@ project "test"
     objdir "bin/obj/"
 
     files {"test/main.cpp"}
-    includedirs {"src/"}
-    links {"datapak"}
+    includedirs {"src/", "external/"}
+    libdirs {"external/"}
+    links {"datapak", "snappy"}
     
     filter "configurations:Debug"
         defines { "DEBUG" }
