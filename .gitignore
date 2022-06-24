@@ -6,4 +6,5 @@ bin/
 .DS_Store
 re.sh
 all.sh
+run.sh
 commit.sh
