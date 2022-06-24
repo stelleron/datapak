@@ -33,9 +33,8 @@ project "test"
     objdir "bin/obj/"
 
     files {"test/main.cpp"}
-    includedirs {"src/", "external/"}
-    libdirs {"external/"}
-    links {"datapak", "snappy"}
+    includedirs {"src/"}
+    links {"datapak"}
     
     filter "configurations:Debug"
         defines { "DEBUG" }
