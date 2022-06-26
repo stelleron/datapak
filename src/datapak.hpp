@@ -1,14 +1,14 @@
 #ifndef DATAPAK_HPP
     #define DATAPAK_HPP
     #include <string>
-    #include <fstream>
+    #include <stdio.h>
     #define DATAPAK_VERSION "0.0.0"
     // Struct for storing the datapak file (extension blind)
     struct Datapak {
         private:
             // Struct for the file header
             struct FileHeader {
-                char version[10];
+                char version[15];
                 int dataCount;
             };
             // Struct for every data header
@@ -19,7 +19,7 @@
             };
 
             // Fields
-            std::fstream file;
+            FILE* file;
             FileHeader header;
         public:
             Datapak(const char* filepath); // Load the datapak
