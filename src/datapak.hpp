@@ -11,7 +11,7 @@
                 char version[15];
                 int dataCount;
             };
-            
+
             // Struct for every data header
             struct DataHeader {
                 char alias[200];

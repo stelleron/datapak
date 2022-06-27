@@ -10,7 +10,7 @@
 
 // Impl. for datapak
 Datapak::Datapak(const char* filename) {
-    //== First check if the file exists == 
+    //== First check if the file exists
     struct stat buffer;
     bool fileExists = (stat(filename, &buffer) == 0);
     if (!fileExists) {
@@ -31,6 +31,14 @@ Datapak::Datapak(const char* filename) {
                 nHeader.dataCount = 0;
                 fwrite(&nHeader, sizeof(nHeader), 1, file);
         }
+    }
+    //== Then read the the file header
+    fseek(file, 0, SEEK_SET);
+    fread(&header, sizeof(header), 1, file);
+    //== Check if versions are compatiable as well
+    if (strcmp(header.version, DATAPAK_VERSION) != 0) {
+        std::cout << "File version is not compatiable with Datapak!" << std::endl;
+        exit(0);
     }
 }
 
