@@ -55,6 +55,7 @@ Datapak::Datapak(const char* filename) {
         fread(cache, chunks[x].header.baseSize, 1, file);
         chunks[x].data = cache;
         delete[] cache;
+        std::cout << chunks[x].header.alias << std::endl;
         std::cout << chunks[x].data << std::endl;
     }
     //== Finally close the file and save the filename for later
