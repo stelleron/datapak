@@ -4,7 +4,7 @@ workspace "DataPak"
     configurations {"Debug", "Release"}
 
 project "datapak"
-    kind "StaticLib"
+    kind "SharedLib"
     language "C++"
     cppdialect "C++17"
 

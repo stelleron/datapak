@@ -1,5 +1,6 @@
 #ifndef DATAPAK_HPP
     #define DATAPAK_HPP
+    #include <vector>
     #include <string>
     #include <stdio.h>
     #define DATAPAK_VERSION "0.0.0"
@@ -19,9 +20,17 @@
                 int compSize;
             };
 
+            // Struct to store chunks of data
+            struct DataChunk {
+                DataHeader header;
+                std::string data;
+            };
+
             // Fields
             FILE* file;
+            std::string filename;
             FileHeader header;
+            std::vector<DataChunk> chunks;
         public:
             Datapak(const char* filepath); // Load the datapak
             ~Datapak();
