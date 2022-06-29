@@ -3,5 +3,4 @@
 
 int main() {
     Datapak dat("bin/file.datapak");
-    dat.purge();
 }
