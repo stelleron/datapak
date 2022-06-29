@@ -56,9 +56,6 @@ Datapak::Datapak(const char* filename) {
         chunks[x].data = cache;
         delete[] cache;
     }
-    //== Before closing the file get the file size
-    fseek(file, 0, SEEK_END);
-    size = ftell(file);
     //== Finally close the file and save the filename for later
     std::cout << "Loaded all chunks!\n";
     fclose(file);
@@ -76,13 +73,11 @@ void Datapak::write(const char* alias, const std::string& data) {
         std::cout << "Rewriting existing data stored in the given alias: " << alias << std::endl;
         for (int x = 0; x < header.dataCount; x++) {
             if (strcmp(alias, chunks[x].header.alias) == 0) {
-                size -= sizeof(chunks[x].header.compSize);
                 std::string compData;
                 compData = data;
                 chunks[x].data = compData;
                 chunks[x].header.baseSize = data.size();
                 chunks[x].header.compSize = compData.size();
-                size += sizeof(chunks[x].header.compSize);
             }
         }
     }
@@ -99,8 +94,6 @@ void Datapak::write(const char* alias, const std::string& data) {
         // Then add it to the chunk array
         chunks.push_back(chunk);
         header.dataCount += 1;     
-        // Also rewrite the file size
-        size += sizeof(DataHeader) + sizeof(chunk.header.compSize);    
     }
 }
 
@@ -139,7 +132,6 @@ void Datapak::purge() {
     // Reset all stored data
     header.dataCount = 0;
     chunks.clear();
-    size = sizeof(FileHeader);
 }
 
 bool Datapak::find(const char* alias) {
@@ -176,8 +168,6 @@ void Datapak::remove(const char* alias) {
     // Iterate through the chunks and find the one to be removed
     for (auto iter = chunks.begin(); iter != chunks.end(); ++iter) {
         if (strcmp(iter->header.alias, alias) == 0) {
-            // Decrease size
-            size -= sizeof(DataHeader) + sizeof(iter->header.compSize); 
             chunks.erase(iter);
             header.dataCount -= 1;
             return;

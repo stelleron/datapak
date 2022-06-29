@@ -34,8 +34,6 @@
 
             bool isClosed;
         public:
-            int size; // Stores the file size
-            
             Datapak(const char* filepath); // Load the datapak
             ~Datapak();
 
