@@ -157,3 +157,15 @@ int Datapak::getCompSize(const char* alias) {
     std::cout << "Unable to find data under the given alias!" << std::endl; 
     return 0;
 }
+
+void Datapak::remove(const char* alias) {
+    // Iterate through the chunks and find the one to be removed
+    for (auto iter = chunks.begin(); iter != chunks.end(); ++iter) {
+        if (strcmp(iter->header.alias, alias) == 0) {
+            chunks.erase(iter);
+            header.dataCount -= 1;
+            return;
+        }
+    }
+    std::cout << "Unable to find data under the given alias!\n";
+}

@@ -44,6 +44,7 @@
             void write(const char* alias, const std::string& data); // Compress and write given data to the datapak
             std::string read(const char* alias); // Decompress and read data  
 
+            void remove(const char* alias); // Remove data under a given alias 
             void purge(); // Reset the datapak (USE VERY CAREFULLY!)
             void close(); // Close the file
 
