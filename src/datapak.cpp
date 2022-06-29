@@ -55,28 +55,16 @@ Datapak::Datapak(const char* filename) {
         fread(cache, chunks[x].header.baseSize, 1, file);
         chunks[x].data = cache;
         delete[] cache;
-        std::cout << chunks[x].header.alias << std::endl;
-        std::cout << chunks[x].data << std::endl;
     }
     //== Finally close the file and save the filename for later
     std::cout << "Loaded all chunks!\n";
     fclose(file);
     this->filename = filename;
+    isClosed = false;
 }
 
 Datapak::~Datapak() {
-    //== Open the file for write operations
-    file = fopen(filename.c_str(), "w");
-    //== Now serialize the file
-    fseek(file, 0, SEEK_SET);
-    fwrite(&header, sizeof(header), 1, file);
-        
-    for(int x = 0; x < header.dataCount; x++) {
-        fwrite(&chunks[x].header, sizeof(chunks[x].header), 1, file);
-        fwrite(chunks[x].data.c_str(), chunks[x].header.compSize, 1, file);
-    }
-    //== Finally close the file
-    fclose(file);
+    close();
 }   
 
 void Datapak::write(const char* alias, const std::string& data) {
@@ -84,9 +72,44 @@ void Datapak::write(const char* alias, const std::string& data) {
     DataChunk chunk;
     strcpy(chunk.header.alias, alias);
     chunk.header.baseSize = data.size(); 
-    COMPRESS(data, chunk.data);
+    chunk.data = data;
     chunk.header.compSize = chunk.data.size();
     // Then add it to the chunk array
     chunks.push_back(chunk);
     header.dataCount += 1;
+}
+
+std::string Datapak::read(const char* alias) {
+    // First find the header in the chunk array
+    for (int x = 0; x < header.dataCount; x++) {
+        if (strcmp(alias, chunks[x].header.alias) == 0) {
+            // Then read it to the string
+            return chunks[x].data;
+        }
+    }
+    std::cout << "Unable to find data under the given alias!" << std::endl; 
+    return "";
+}
+
+void Datapak::close() {
+    if (!isClosed) { // Check if the file is closed first
+        //== Open the file for write operations
+        file = fopen(filename.c_str(), "w");
+        //== Now serialize the file
+        fseek(file, 0, SEEK_SET);
+        fwrite(&header, sizeof(header), 1, file);
+            
+        for(int x = 0; x < header.dataCount; x++) {
+            fwrite(&chunks[x].header, sizeof(chunks[x].header), 1, file);
+            fwrite(chunks[x].data.c_str(), chunks[x].header.compSize, 1, file);
+        }
+        //== Finally close the file
+        fclose(file);
+    }
+}
+
+void Datapak::purge() {
+    // Reset all stored data
+    header.dataCount = 0;
+    chunks.clear();
 }

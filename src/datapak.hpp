@@ -31,6 +31,8 @@
             std::string filename;
             FileHeader header;
             std::vector<DataChunk> chunks;
+
+            bool isClosed;
         public:
             Datapak(const char* filepath); // Load the datapak
             ~Datapak();
@@ -40,6 +42,10 @@
             int getSize(const char* alias); // Get the size of the file decompressed (in bytes)
 
             void write(const char* alias, const std::string& data); // Compress and write given data to the datapak
-            void read(const char* alias, const std::string* ptr); // Decompress and read data to the given string pointer      
+            std::string read(const char* alias); // Decompress and read data  
+
+            void purge(); // Reset the datapak (USE VERY CAREFULLY!)
+            void close(); // Close the file
+
     };
 #endif
