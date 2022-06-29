@@ -87,7 +87,7 @@ void Datapak::write(const char* alias, const std::string& data) {
         DataChunk chunk;
         strcpy(chunk.header.alias, alias);
         std::string compData;
-        COMPRESS(data, compData);
+        compData = data;
         chunk.header.baseSize = data.size(); 
         chunk.data = compData;
         chunk.header.compSize = chunk.data.size();

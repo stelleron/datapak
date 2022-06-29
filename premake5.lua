@@ -32,8 +32,8 @@ project "test"
     targetdir "bin/"
     objdir "bin/obj/"
 
-    files {"test/main.cpp"}
-    includedirs {"src/"}
+    files {"test/main.cpp", "wren/wren.c"}
+    includedirs {"src/", "wren/"}
     links {"datapak"}
     
     filter "configurations:Debug"
