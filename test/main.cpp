@@ -3,6 +3,5 @@
 
 int main() {
     Datapak dat("bin/file.datapak");
-    dat.purge(); 
-    std::string family = "apples\n";
+    dat.purge();
 }

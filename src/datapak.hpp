@@ -3,7 +3,7 @@
     #include <vector>
     #include <string>
     #include <stdio.h>
-    #define DATAPAK_VERSION "0.0.0"
+    #define DATAPAK_VERSION "1.0.0"
     // Struct for storing the datapak file (extension blind)
     struct Datapak {
         private:
