@@ -113,3 +113,23 @@ void Datapak::purge() {
     header.dataCount = 0;
     chunks.clear();
 }
+
+bool Datapak::find(const char* alias) {
+    // Find the alias
+    for (int x = 0; x < header.dataCount; x++) {
+        if (strcmp(alias, chunks[x].header.alias) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int Datapak::getSize(const char* alias) {
+    for (int x = 0; x < header.dataCount; x++) {
+        if (strcmp(alias, chunks[x].header.alias) == 0) {
+            return chunks[x].header.baseSize;
+        }
+    }
+    std::cout << "Unable to find data under the given alias!" << std::endl; 
+    return 0;
+}
