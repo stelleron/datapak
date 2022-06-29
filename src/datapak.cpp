@@ -68,15 +68,29 @@ Datapak::~Datapak() {
 }   
 
 void Datapak::write(const char* alias, const std::string& data) {
-    // Create a new chunk
-    DataChunk chunk;
-    strcpy(chunk.header.alias, alias);
-    chunk.header.baseSize = data.size(); 
-    chunk.data = data;
-    chunk.header.compSize = chunk.data.size();
-    // Then add it to the chunk array
-    chunks.push_back(chunk);
-    header.dataCount += 1;
+    // If the alias already exists, rewrite the existing data
+    if (find(alias)) {
+        std::cout << "Rewriting existing data stored in the given alias: " << alias << std::endl;
+        for (int x = 0; x < header.dataCount; x++) {
+            if (strcmp(alias, chunks[x].header.alias) == 0) {
+                chunks[x].data = data;
+                chunks[x].header.baseSize = data.size();
+                chunks[x].header.compSize = data.size();
+            }
+        }
+    }
+    // Else add the data to the chunk array
+    else {
+        // Create a new chunk
+        DataChunk chunk;
+        strcpy(chunk.header.alias, alias);
+        chunk.header.baseSize = data.size(); 
+        chunk.data = data;
+        chunk.header.compSize = chunk.data.size();
+        // Then add it to the chunk array
+        chunks.push_back(chunk);
+        header.dataCount += 1;         
+    }
 }
 
 std::string Datapak::read(const char* alias) {
@@ -128,6 +142,16 @@ int Datapak::getSize(const char* alias) {
     for (int x = 0; x < header.dataCount; x++) {
         if (strcmp(alias, chunks[x].header.alias) == 0) {
             return chunks[x].header.baseSize;
+        }
+    }
+    std::cout << "Unable to find data under the given alias!" << std::endl; 
+    return 0;
+}
+
+int Datapak::getCompSize(const char* alias) {
+    for (int x = 0; x < header.dataCount; x++) {
+        if (strcmp(alias, chunks[x].header.alias) == 0) {
+            return chunks[x].header.compSize;
         }
     }
     std::cout << "Unable to find data under the given alias!" << std::endl; 
