@@ -4,7 +4,7 @@ workspace "DataPak"
     configurations {"Debug", "Release"}
 
 project "datapak"
-    kind "SharedLib"
+    kind "StaticLib"
     language "C++"
     cppdialect "C++17"
 
@@ -13,8 +13,6 @@ project "datapak"
 
     files {"src/datapak.cpp"}
     includedirs {"external/"}
-    libdirs {"external/"}
-    links {"snappy"}
     
     filter "configurations:Debug"
         defines { "DEBUG" }

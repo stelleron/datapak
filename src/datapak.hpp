@@ -38,11 +38,11 @@
             ~Datapak();
 
             bool find(const char* alias); // Find whether the given file exists in the datapak
-            int getCompSize(const char* alias); // Get the size of the compressed file in the datapak (in bytes)
-            int getSize(const char* alias); // Get the size of the file decompressed (in bytes)
+            int getBaseSize(const char* alias); // Get the size of the file decompressed
+            int getCompSize(const char* alias); // Get the size of the compressed file
 
-            void write(const char* alias, const std::string& data); // Compress and write given data to the datapak
-            std::string read(const char* alias); // Decompress and read data  
+            void write(const char* alias, const std::string& data); // Compress & write given data to the datapak
+            std::string read(const char* alias); // Decompress & read data from the datapak 
 
             void remove(const char* alias); // Remove data under a given alias 
             void purge(); // Reset the datapak (USE VERY CAREFULLY!)

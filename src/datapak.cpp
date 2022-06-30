@@ -1,13 +1,17 @@
 #include <sys/stat.h>
 #include <iostream>
 #include <string.h>
-#include "snappy-stubs-public.h"
-#include "snappy.h"
+#define SINFL_IMPLEMENTATION
+#define SDEFL_IMPLEMENTATION
+#include "sdefl.h"
+#include "sinfl.h"
 #include "datapak.hpp"
 
-#define COMP_ARGS(input, output) input.data(), input.size(), &output
-#define COMPRESS(input, output) snappy::Compress(COMP_ARGS(input, output))
-#define DECOMPRESS(input, output) snappy::Uncompress(COMP_ARGS(input, output))
+#ifdef ENABLE_DATAPAK_LOGGER
+    #define LOG(arg) std::cout << arg << std::endl
+#else 
+    #define LOG(arg)
+#endif
 
 // Impl. for datapak
 Datapak::Datapak(const char* filename) {
@@ -15,7 +19,7 @@ Datapak::Datapak(const char* filename) {
     struct stat buffer;
     bool fileExists = (stat(filename, &buffer) == 0);
     if (!fileExists) {
-        std::cout << "File does not exist. Creating new .datapak" << std::endl;
+        LOG("File does not exist. Creating new .datapak");
         file = fopen(filename, "w");
         fclose(file);
     }
@@ -26,7 +30,7 @@ Datapak::Datapak(const char* filename) {
     {
         int size = ftell(file);
         if (size == 0) {
-            std::cout << "File is empty. Initialising file..." << std::endl;
+            LOG("File is empty. Initialising file...");
             FileHeader nHeader;
                 strcpy(nHeader.version, DATAPAK_VERSION);
                 nHeader.dataCount = 0;
@@ -42,12 +46,12 @@ Datapak::Datapak(const char* filename) {
     fread(&header, sizeof(header), 1, file);
     //== Check if versions are compatiable as well
     if (strcmp(header.version, DATAPAK_VERSION) != 0) {
-        std::cout << "File version is not compatiable with Datapak!" << std::endl;
+        LOG("File version is not compatiable with Datapak!");
         exit(0);
     }
     //== Now read all of the data chunks
     chunks.resize(header.dataCount);
-    std::cout << "Found " << header.dataCount << " chunks. Loading them..." << std::endl;
+    LOG("Found " << header.dataCount << " chunks. Loading them...");
     char* cache; // Used to cache string data to be written to the chunk array
     for(int x = 0; x < header.dataCount; x++) {
         fread(&chunks[x].header, sizeof(chunks[x].header), 1, file);
@@ -57,7 +61,7 @@ Datapak::Datapak(const char* filename) {
         delete[] cache;
     }
     //== Finally close the file and save the filename for later
-    std::cout << "Loaded all chunks!\n";
+    LOG("Loaded all chunks!");
     fclose(file);
     this->filename = filename;
     isClosed = false;
@@ -70,7 +74,7 @@ Datapak::~Datapak() {
 void Datapak::write(const char* alias, const std::string& data) {
     // If the alias already exists, rewrite the existing data
     if (find(alias)) {
-        std::cout << "Rewriting existing data stored in the given alias: " << alias << std::endl;
+        LOG("Rewriting existing data stored in the given alias: " << alias);
         for (int x = 0; x < header.dataCount; x++) {
             if (strcmp(alias, chunks[x].header.alias) == 0) {
                 std::string compData;
@@ -107,7 +111,7 @@ std::string Datapak::read(const char* alias) {
             return decompData;
         }
     }
-    std::cout << "Unable to find data under the given alias!" << std::endl; 
+    LOG("Unable to find data under the given alias!")
     return "";
 }
 
@@ -144,13 +148,13 @@ bool Datapak::find(const char* alias) {
     return false;
 }
 
-int Datapak::getSize(const char* alias) {
+int Datapak::getBaseSize(const char* alias) {
     for (int x = 0; x < header.dataCount; x++) {
         if (strcmp(alias, chunks[x].header.alias) == 0) {
             return chunks[x].header.baseSize;
         }
     }
-    std::cout << "Unable to find data under the given alias!" << std::endl; 
+    LOG("Unable to find data under the given alias!")
     return 0;
 }
 
@@ -160,7 +164,7 @@ int Datapak::getCompSize(const char* alias) {
             return chunks[x].header.compSize;
         }
     }
-    std::cout << "Unable to find data under the given alias!" << std::endl; 
+    LOG("Unable to find data under the given alias!")
     return 0;
 }
 
@@ -173,5 +177,5 @@ void Datapak::remove(const char* alias) {
             return;
         }
     }
-    std::cout << "Unable to find data under the given alias!\n";
+    LOG("Unable to find data under the given alias!");
 }

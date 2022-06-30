@@ -1,38 +1,51 @@
-#ifndef DATAPAK_H
-    #define DATAPAK_H
-    #include <string>
-    #include <fstream>
+#ifndef DATAPAK_HPP
+    #define DATAPAK_HPP
     #include <vector>
-    // Macros to define .datapak access type
-    #define DATAPAK_READ 'r'
-    #define DATAPAK_WRITE 'w'
-    #define DATAPAK_APPEND 'a'
-    // Stores a .datapak instance
-    struct DataPak {
+    #include <string>
+    #include <stdio.h>
+    #define DATAPAK_VERSION "1.0.0"
+    // Struct for storing the datapak file (extension blind)
+    struct Datapak {
         private:
-            struct DataChunk {
-                std::string alias;
-                int startline;
-                int endline;
-                DataChunk(){}
+            // Struct for the file header
+            struct FileHeader {
+                char version[15];
+                int dataCount;
             };
-            std::fstream file;
-            std::string filename;
-            char accessType;   
-            std::vector<DataChunk> chunks; // Store all of the chunks in the .datapak
-        public:
-            // Open an existing .datapak file or load a currently existing one
-            DataPak(const char* filename, const char accessType);
-            // Destroy the datapak object
-            ~DataPak();
 
-            // Check for the presence of data under a given alias
-            bool findData(const char* alias);
-            // Get the size of file data stored under a given alias
-            int getDataSize(const char* alias);
-            // Decompress and read file data from a given alias
-            void readData(const char* alias, unsigned char* dataptr);
-            // Compress and write file data under a given alias
-            void writeData(const char* alias, unsigned char* dataptr, int size);
+            // Struct for every data header
+            struct DataHeader {
+                char alias[200];
+                int baseSize;
+                int compSize;
+            };
+
+            // Struct to store chunks of data
+            struct DataChunk {
+                DataHeader header;
+                std::string data;
+            };
+
+            // Fields
+            FILE* file;
+            std::string filename;
+            FileHeader header;
+            std::vector<DataChunk> chunks;
+
+            bool isClosed;
+        public:
+            Datapak(const char* filepath); // Load the datapak
+            ~Datapak();
+
+            bool find(const char* alias); // Find whether the given file exists in the datapak
+            int getSize(const char* alias); // Get the size of the file decompressed (in bytes)
+
+            void write(const char* alias, const std::string& data); // Write given data to the datapak
+            std::string read(const char* alias); // Read data from the datapak 
+
+            void remove(const char* alias); // Remove data under a given alias 
+            void purge(); // Reset the datapak (USE VERY CAREFULLY!)
+            void close(); // Close the file
+
     };
 #endif
