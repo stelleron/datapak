@@ -1,17 +1,13 @@
 #include <sys/stat.h>
-#include <iostream>
 #include <string.h>
+#include <iostream>
 #define SINFL_IMPLEMENTATION
 #define SDEFL_IMPLEMENTATION
 #include "sdefl.h"
 #include "sinfl.h"
 #include "datapak.hpp"
 
-#ifdef ENABLE_DATAPAK_LOGGER
-    #define LOG(arg) std::cout << arg << std::endl
-#else 
-    #define LOG(arg)
-#endif
+#define LOG(arg) std::cout << arg << std::endl
 
 // Impl. for datapak
 Datapak::Datapak(const char* filename) {
@@ -77,11 +73,20 @@ void Datapak::write(const char* alias, const std::string& data) {
         LOG("Rewriting existing data stored in the given alias: " << alias);
         for (int x = 0; x < header.dataCount; x++) {
             if (strcmp(alias, chunks[x].header.alias) == 0) {
-                std::string compData;
-                compData = data;
-                chunks[x].data = compData;
+                char* compData;
+                compData = new char[data.size()];
+
+                struct sdefl sdefl = { 0 };
+                int bounds = sdefl_bound(data.size());
+
                 chunks[x].header.baseSize = data.size();
-                chunks[x].header.compSize = compData.size();
+                chunks[x].header.compSize = sdeflate(&sdefl, compData, data.c_str(), data.size(), 8);
+
+                chunks[x].data = compData;
+                delete[] compData;
+                LOG("Compressed data from " << chunks[x].header.baseSize << " bytes to " << chunks[x].header.compSize << "bytes.");
+                
+                return;
             }
         }
     }
@@ -90,14 +95,23 @@ void Datapak::write(const char* alias, const std::string& data) {
         // Create a new chunk
         DataChunk chunk;
         strcpy(chunk.header.alias, alias);
-        std::string compData;
-        compData = data;
+
+        struct sdefl sdefl = { 0 };
+        int bounds = sdefl_bound(data.size());
+
+        char* compData;
+        compData = new char[data.size()];
+
         chunk.header.baseSize = data.size(); 
+        chunk.header.compSize = sdeflate(&sdefl, compData, data.c_str(), data.size(), 8);
+        
         chunk.data = compData;
-        chunk.header.compSize = chunk.data.size();
+        delete[] compData;  
+
         // Then add it to the chunk array
         chunks.push_back(chunk);
-        header.dataCount += 1;     
+        header.dataCount += 1;   
+        LOG("Compressed data from " << chunk.header.baseSize << " bytes to " << chunk.header.compSize << " bytes.");
     }
 }
 
@@ -105,13 +119,15 @@ std::string Datapak::read(const char* alias) {
     // First find the header in the chunk array
     for (int x = 0; x < header.dataCount; x++) {
         if (strcmp(alias, chunks[x].header.alias) == 0) {
-            std::string decompData;
-            decompData = chunks[x].data;
+            char* decompData = new char[64 * 1024 * 1024];
+            sinflate(decompData, 64, chunks[x].data.c_str(), chunks[x].header.compSize);
+            std::string nData = decompData;
+            delete[] decompData;
             // Then read it to the string
-            return decompData;
+            return nData;
         }
     }
-    LOG("Unable to find data under the given alias!")
+    LOG("Unable to find data under the given alias!");
     return "";
 }
 
@@ -154,7 +170,7 @@ int Datapak::getBaseSize(const char* alias) {
             return chunks[x].header.baseSize;
         }
     }
-    LOG("Unable to find data under the given alias!")
+    LOG("Unable to find data under the given alias!");
     return 0;
 }
 
@@ -164,7 +180,7 @@ int Datapak::getCompSize(const char* alias) {
             return chunks[x].header.compSize;
         }
     }
-    LOG("Unable to find data under the given alias!")
+    LOG("Unable to find data under the given alias!");
     return 0;
 }
 
