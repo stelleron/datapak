@@ -10,3 +10,4 @@ run.sh
 commit.sh
 comptest.make
 wren/
+cache/
