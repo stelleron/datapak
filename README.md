@@ -8,10 +8,6 @@ Currently the version of Datapak is 1.0.0. If the Datapak file has a different v
 
 ### Example
 '''cpp
-#define ENABLE_DATAPAK_LOGGER // Enable the logger to output messages
-#include "datapak.hpp"
-#include <iostream>
-
 int main() {
     // Open a datapak file or create a new datapak and store it here
     Datapak dat("bin/file.datapak");
