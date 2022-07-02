@@ -1,0 +1,2 @@
+make comptest
+./bin/comptest

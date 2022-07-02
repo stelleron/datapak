@@ -41,3 +41,22 @@ project "test"
     filter "configurations:Release"
         defines { "NDEBUG" }
         optimize "On"
+
+project "comptest" 
+    kind "ConsoleApp"
+    language "C++"
+    cppdialect "C++17"
+
+    targetdir "bin/"
+    objdir "bin/obj/"
+
+    files {"test/comptest.cpp"}
+    includedirs {"external/"}
+    
+    filter "configurations:Debug"
+        defines { "DEBUG" }
+        symbols "On"
+
+    filter "configurations:Release"
+        defines { "NDEBUG" }
+        optimize "On"

@@ -8,3 +8,5 @@ re.sh
 all.sh
 run.sh
 commit.sh
+comptest.make
+wren/

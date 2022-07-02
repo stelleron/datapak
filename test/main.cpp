@@ -5,7 +5,7 @@
 int main() {
     Datapak dat("bin/file.datapak");
     dat.purge();
-    std::string family = "Occular Occular Occular Occular Potato Family Apply Rapply\n";
-    dat.write("apple", family);
-    std::cout << dat.read("apple") << std::endl;
+    std::string family = "How How How How How How How How How How How How How How How How\n";
+    dat.write("apple.txt", family);
+    std::cout << dat.read("apple.txt") << std::endl;
 }
