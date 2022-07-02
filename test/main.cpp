@@ -7,12 +7,8 @@ int main() {
     Datapak dat("bin/file.datapak");
     dat.purge(); // Erase all data from the datapak
 
-    std::string helloworld = "HelloWorld HelloWorld HelloWorld HelloWorld HelloWorld HelloWorld\n";
+    std::string helloworld = "sjdwjfodsjfdisfofsijosdjfodshttps://github.com/microsoft/vscode/issues/36069";
     dat.write("hello.txt", helloworld); // Write data to the datapak under a given alias used to reference the file
 
-    std::cout << dat.read("hello.txt"); // Load the data stored under the given alias
-    std::cout << dat.find("helo.txt"); // Check whether data exists under the given header(returns FALSE here)
-
-    dat.remove("hello.txt"); // Remove a file from the given header
-    dat.close(); // Close the file and serialize all stored data(automatically called when Datapak leaves scope)
+    std::cout << dat.read("hello.txt") << std::endl; // Load the data stored under the given alias
 }

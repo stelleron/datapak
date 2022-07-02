@@ -20,20 +20,17 @@ T* compressData(const T* data, int size, int* compSize) {
     struct sdefl sdefl = { 0 };
     int bounds = sdefl_bound(size);
     T* compData = new T[bounds];
-    *compSize = sdeflate(&sdefl, compData, data, size, COMP_QUALITY);
+    *compSize = sdeflate(&sdefl, compData, data, size, COMPRESSION_QUALITY_DEFLATE);
     std::cout << "SYSTEM: Compress data: Original size: " << size << " -> Comp. size: " << *compSize << std::endl;
     return compData;
 }
 
 template <typename T>
 T* decompressData(const T* compData, int compSize, int* size) {
-    T* data = new T[MAX_DECOMP_SIZE*1024*1024];
-    int length = sinflate(data, MAX_DECOMP_SIZE, compData, compSize);
-    T* temp = (T*)realloc(data, length);
-    if (temp != NULL) data = temp;
-    else std::cout << "SYSTEM: Failed to re-allocate required decompression memory" << std::endl;
+    T* data = new T[64*1024*1024];
+    int length = sinflate(data, 64, compData, compSize);
     *size = length;
-    std::cout << "SYSTEM: Decompress data: Original size: " << *size << " <- Comp. size: " << compSize << std::endl;
+    std::cout << "SYSTEM: Decompress data: Comp. size: " << compSize << " -> Original size: " << *size << std::endl;
     return data;
 }
 
