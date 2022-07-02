@@ -11,8 +11,7 @@
 #define LOG(arg) std::cout << arg << std::endl
 #define COMP_QUALITY  8
 #define MAX_DECOMP_SIZE 32
-#define FREE_DATA(arg) delete[] arg
-#define FIND_ERROR LOG("Unable to find data under the given alias!")
+#define FREE_DATA delete[]
 
 // Compression functions
 template <typename T>
@@ -76,14 +75,13 @@ Datapak::Datapak(const char* filename) {
     //== Now read all of the data chunks
     chunks.resize(header.dataCount);
     LOG("Found " << header.dataCount << " chunks. Loading them...");
-
+    char* cache; // Used to cache string data to be written to the chunk array
     for(int x = 0; x < header.dataCount; x++) {
-        // First read the header
         fread(&chunks[x].header, sizeof(chunks[x].header), 1, file);
-        // Then the data
-        chunks[x].data = new char[chunks[x].header.baseSize];
-        fread(chunks[x].data, chunks[x].header.baseSize, 1, file);
-        // NOTE: Remember to free all aloocated data
+        cache = new char[chunks[x].header.baseSize];
+        fread(cache, chunks[x].header.baseSize, 1, file);
+        chunks[x].data = cache;
+        delete[] cache;
     }
     //== Finally close the file and save the filename for later
     LOG("Loaded all chunks!");
@@ -96,73 +94,50 @@ Datapak::~Datapak() {
     close();
 }   
 
-bool Datapak::find(const char* alias) {
-    // Find the alias
-    for (int x = 0; x < header.dataCount; x++) {
-        if (strcmp(alias, chunks[x].header.alias) == 0) {
-            // Set the pointer to the data chunk
-            ptr = x;
-            return true;
+void Datapak::write(const char* alias, const std::string& data) {
+    // If the alias already exists, rewrite the existing data
+    if (find(alias)) {
+        LOG("Rewriting existing data stored in the given alias: " << alias);
+        for (int x = 0; x < header.dataCount; x++) {
+            if (strcmp(alias, chunks[x].header.alias) == 0) {
+                chunks[x].header.baseSize = data.size();
+                char* compData = compressData<char>(data.c_str(), data.size(), &chunks[x].header.compSize);
+                chunks[x].data = compData;
+                FREE_DATA compData;
+                return;
+            }
         }
     }
-    return false;
-}
-
-int Datapak::getBaseSize(const char* alias) {
-    // Find the chunk then get the size
-    if (find(alias)) {
-        return chunks[ptr].header.baseSize;
-    }
+    // Else add the data to the chunk array
     else {
-        FIND_ERROR;
-        return 0;
-    }
-}
-
-int Datapak::getCompSize(const char* alias) {
-    // Find the chunk then get the size
-    if (find(alias)) {
-        return chunks[ptr].header.compSize;
-    }
-    else {
-        FIND_ERROR;
-        return 0;
-    }
-}
-
-void Datapak::write(const char* alias, const std::string& data) {
-    // First check if the alias exists
-    if (find(alias)) {
-        // If it does, rewrite the stored data
-        FREE_DATA(chunks[ptr].data);
-        chunks[ptr].header.baseSize = data.size();
-        chunks[ptr].data = compressData<char>(data.c_str(), data.size(), &chunks[ptr].header.compSize);
-    }
-    else {
-        // Else add a new chunk
+        // Create a new chunk
         DataChunk chunk;
         strcpy(chunk.header.alias, alias);
 
         chunk.header.baseSize = data.size();
-        chunk.data = compressData<char>(data.c_str(), data.size(), &chunk.header.compSize);
-
+        char* compData = compressData<char>(data.c_str(), data.size(), &chunk.header.compSize);
+        chunk.data = compData;
+        FREE_DATA compData;
+        // Add the chunk to the chunk array
         chunks.push_back(chunk);
         header.dataCount += 1;   
+        return;
     }
 }
 
 std::string Datapak::read(const char* alias) {
-    // First check if the alias exists
-    if (find(alias)) {
-        char* decompData = decompressData<char>(chunks[ptr].data, chunks[ptr].header.compSize, &chunks[ptr].header.baseSize);
-        std::string nData = decompData;
-        FREE_DATA(decompData);
-        return nData;
+    // First find the header in the chunk array
+    for (int x = 0; x < header.dataCount; x++) {
+        if (strcmp(alias, chunks[x].header.alias) == 0) {
+            char* decompData = decompressData<char>(chunks[x].data.c_str(), chunks[x].header.compSize, &chunks[x].header.baseSize);
+            std::string nData = decompData;
+            FREE_DATA decompData;
+            // Then read it to the string
+            return nData;
+        }
     }
-    else {
-        FIND_ERROR;
-        return 0;
-    }    
+    LOG("Unable to find data under the given alias!");
+    return "";
 }
 
 void Datapak::close() {
@@ -175,7 +150,7 @@ void Datapak::close() {
             
         for(int x = 0; x < header.dataCount; x++) {
             fwrite(&chunks[x].header, sizeof(chunks[x].header), 1, file);
-            fwrite(chunks[x].data, chunks[x].header.compSize, 1, file);
+            fwrite(chunks[x].data.c_str(), chunks[x].header.compSize, 1, file);
         }
         //== Finally close the file
         fclose(file);
@@ -188,7 +163,36 @@ void Datapak::purge() {
     chunks.clear();
 }
 
-// Iterate through the chunks and find the one to be removed
+bool Datapak::find(const char* alias) {
+    // Find the alias
+    for (int x = 0; x < header.dataCount; x++) {
+        if (strcmp(alias, chunks[x].header.alias) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int Datapak::getBaseSize(const char* alias) {
+    for (int x = 0; x < header.dataCount; x++) {
+        if (strcmp(alias, chunks[x].header.alias) == 0) {
+            return chunks[x].header.baseSize;
+        }
+    }
+    LOG("Unable to find data under the given alias!");
+    return 0;
+}
+
+int Datapak::getCompSize(const char* alias) {
+    for (int x = 0; x < header.dataCount; x++) {
+        if (strcmp(alias, chunks[x].header.alias) == 0) {
+            return chunks[x].header.compSize;
+        }
+    }
+    LOG("Unable to find data under the given alias!");
+    return 0;
+}
+
 void Datapak::remove(const char* alias) {
     // Iterate through the chunks and find the one to be removed
     for (auto iter = chunks.begin(); iter != chunks.end(); ++iter) {

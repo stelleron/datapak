@@ -1,1 +1,4 @@
-# Datapak -  A lightweight C++ library for packaging and compressing multiple files into a single file
+# Datapak -  A lightweight C++ packaging library
+
+## Summary
+Datapak is a C++ library that is designed

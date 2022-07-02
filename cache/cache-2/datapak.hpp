@@ -24,7 +24,7 @@
             // Struct to store chunks of data
             struct DataChunk {
                 DataHeader header;
-                char* data;
+                std::string data;
             };
 
             // Fields
@@ -34,7 +34,6 @@
             std::vector<DataChunk> chunks;
 
             bool isClosed;
-            int ptr; // Used to set a pointer when finding a datapak
         public:
             Datapak(const char* filepath); // Load the datapak
             ~Datapak();
