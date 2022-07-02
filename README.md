@@ -7,7 +7,11 @@ Datapak is a C++ library that is designed with simplicity in mind to package and
 Currently the version of Datapak is 1.0.0. If the Datapak file has a different version than the Datapak library it will not be able to read the file.
 
 ### Example
-'''cpp
+```cpp
+#define ENABLE_DATAPAK_LOGGER // Enable the logger to output messages
+#include "datapak.hpp"
+#include <iostream>
+
 int main() {
     // Open a datapak file or create a new datapak and store it here
     Datapak dat("bin/file.datapak");
@@ -22,7 +26,7 @@ int main() {
     dat.remove("hello.txt"); // Remove a file from the given header
     dat.close(); // Close the file and serialize all stored data(automatically called when Datapak leaves scope)
 }
-'''
+```
 
 ## License
 Datapak is open-source and uses the MIT license. Check LICENSE to read more about the terms of usage.
