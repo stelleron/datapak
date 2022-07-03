@@ -9,8 +9,8 @@
 #include <stdlib.h>
 
 #define LOG(arg) std::cout << arg << std::endl
-#define COMP_QUALITY  8
-#define MAX_DECOMP_SIZE 32
+#define COMP_QUALITY 8
+#define MAX_DECOMP_SIZE 64 * 1024 * 1024 // in MB
 #define FREE_DATA(arg) delete[] arg
 #define FIND_ERROR LOG("Unable to find data under the given alias!")
 
@@ -20,15 +20,20 @@ T* compressData(const T* data, int size, int* compSize) {
     struct sdefl sdefl = { 0 };
     int bounds = sdefl_bound(size);
     T* compData = new T[bounds];
-    *compSize = sdeflate(&sdefl, compData, data, size, COMPRESSION_QUALITY_DEFLATE);
+    *compSize = sdeflate(&sdefl, compData, data, size, COMP_QUALITY);
     std::cout << "SYSTEM: Compress data: Original size: " << size << " -> Comp. size: " << *compSize << std::endl;
     return compData;
 }
 
 template <typename T>
 T* decompressData(const T* compData, int compSize, int* size) {
-    T* data = new T[64*1024*1024];
-    int length = sinflate(data, 64, compData, compSize);
+    T* data = new T[MAX_DECOMP_SIZE];
+    int length = sinflate(data, MAX_DECOMP_SIZE, compData, compSize);
+    T* buffer = (T*)realloc(data, length);
+
+    if (buffer != NULL) data = buffer;
+    else LOG("SYSTEM: Failed to re-allocate required decompression memory");
+
     *size = length;
     std::cout << "SYSTEM: Decompress data: Comp. size: " << compSize << " -> Original size: " << *size << std::endl;
     return data;
@@ -133,7 +138,7 @@ void Datapak::write(const char* alias, const std::string& data) {
         // If it does, rewrite the stored data
         FREE_DATA(chunks[ptr].data);
         chunks[ptr].header.baseSize = data.size();
-        chunks[ptr].data = compressData<char>(data.c_str(), data.size(), &chunks[ptr].header.compSize);
+        chunks[ptr].data = compressData<char>(data.data(), data.size(), &chunks[ptr].header.compSize);
     }
     else {
         // Else add a new chunk
@@ -141,7 +146,7 @@ void Datapak::write(const char* alias, const std::string& data) {
         strcpy(chunk.header.alias, alias);
 
         chunk.header.baseSize = data.size();
-        chunk.data = compressData<char>(data.c_str(), data.size(), &chunk.header.compSize);
+        chunk.data = compressData<char>(data.data(), data.size(), &chunk.header.compSize);
 
         chunks.push_back(chunk);
         header.dataCount += 1;   
