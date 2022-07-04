@@ -3,7 +3,8 @@
 
 int main() {
     // Open a datapak file or create a new datapak and store it here
-    Datapak dat("bin/file.datapak");
+    Datapak dat;
+    dat.load("bin/file.datapak"); // Load the file
     dat.purge(); // Erase all data from the datapak
 
     std::string helloworld = "HelloWorld HelloWorld HelloWorld HelloWorld HelloWorld HelloWorld \n";

@@ -38,7 +38,15 @@ T* decompressData(const T* compData, int compSize, int* size) {
 }
 
 // Impl. for datapak
+Datapak::Datapak() {
+    isLoaded = true;
+}
+
 Datapak::Datapak(const char* filename) {
+    load(filename);
+}
+
+void Datapak::load(const char* filename) {
     //== First check if the file exists
     struct stat buffer;
     bool fileExists = (stat(filename, &buffer) == 0);
@@ -90,6 +98,7 @@ Datapak::Datapak(const char* filename) {
     fclose(file);
     this->filename = filename;
     isClosed = false;
+    isLoaded = true;
 }
 
 Datapak::~Datapak() {
@@ -166,7 +175,7 @@ std::string Datapak::read(const char* alias) {
 }
 
 void Datapak::close() {
-    if (!isClosed) { // Check if the file is closed first
+    if (!isClosed && isLoaded) { // Check if the file is closed first
         //== Open the file for write operations
         file = fopen(filename.c_str(), "w");
         //== Now serialize the file
@@ -179,6 +188,8 @@ void Datapak::close() {
         }
         //== Finally close the file
         fclose(file);
+        LOG("Closed the datapak!");
+        isLoaded = false;
     }
 }
 

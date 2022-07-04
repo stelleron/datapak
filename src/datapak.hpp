@@ -32,10 +32,13 @@
             FileHeader header;
             std::vector<DataChunk> chunks;
 
+            bool isLoaded;
             bool isClosed;
             int ptr; // Used to set a pointer when finding a datapak
         public:
+            Datapak(); // Default constructor
             Datapak(const char* filepath); // Load the datapak
+            void load(const char* filepath);
             ~Datapak();
 
             bool find(const char* alias); // Find whether the given file exists in the datapak
