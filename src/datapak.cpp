@@ -39,7 +39,7 @@ T* decompressData(const T* compData, int compSize, int* size) {
 
 // Impl. for datapak
 Datapak::Datapak() {
-    isLoaded = true;
+    isLoaded = false;
 }
 
 Datapak::Datapak(const char* filename) {
