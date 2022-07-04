@@ -1,4 +1,3 @@
-#define ENABLE_DATAPAK_LOGGER // Enable the logger to output messages
 #include "datapak.hpp"
 #include <iostream>
 
