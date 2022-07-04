@@ -198,5 +198,20 @@ void Datapak::remove(const char* alias) {
             return;
         }
     }
-    LOG("Unable to find data under the given alias!");
+    FIND_ERROR;
+}
+
+void Datapak::list() {
+    for (auto iter = chunks.begin(); iter != chunks.end(); ++iter) {
+        LOG(iter->header.alias);
+    }
+}
+
+void Datapak::rename(const char* alias, const char* new_alias) {
+    if(find(alias)) {
+        strcpy(chunks[ptr].header.alias, new_alias);
+    }
+    else {
+        FIND_ERROR;
+    }
 }

@@ -46,6 +46,9 @@
             std::string read(const char* alias); // Decompress & read data from the datapak 
 
             void remove(const char* alias); // Remove data under a given alias 
+            void rename(const char* alias, const char* new_alias); // Rename a file under a given alias
+            void list(); // List all files stored in the datapak
+
             void purge(); // Reset the datapak (USE VERY CAREFULLY!)
             void close(); // Close the file
 
