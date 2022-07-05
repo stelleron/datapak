@@ -12,14 +12,16 @@ ifeq ($(config),debug)
   datapak_config = debug
   test_config = debug
   comptest_config = debug
+  gltest_config = debug
 endif
 ifeq ($(config),release)
   datapak_config = release
   test_config = release
   comptest_config = release
+  gltest_config = release
 endif
 
-PROJECTS := datapak test comptest
+PROJECTS := datapak test comptest gltest
 
 .PHONY: all clean help $(PROJECTS) 
 
@@ -43,10 +45,17 @@ ifneq (,$(comptest_config))
 	@${MAKE} --no-print-directory -C . -f comptest.make config=$(comptest_config)
 endif
 
+gltest: datapak
+ifneq (,$(gltest_config))
+	@echo "==== Building gltest ($(gltest_config)) ===="
+	@${MAKE} --no-print-directory -C . -f gltest.make config=$(gltest_config)
+endif
+
 clean:
 	@${MAKE} --no-print-directory -C . -f datapak.make clean
 	@${MAKE} --no-print-directory -C . -f test.make clean
 	@${MAKE} --no-print-directory -C . -f comptest.make clean
+	@${MAKE} --no-print-directory -C . -f gltest.make clean
 
 help:
 	@echo "Usage: make [config=name] [target]"
@@ -61,5 +70,6 @@ help:
 	@echo "   datapak"
 	@echo "   test"
 	@echo "   comptest"
+	@echo "   gltest"
 	@echo ""
 	@echo "For more information, see https://github.com/premake/premake-core/wiki"

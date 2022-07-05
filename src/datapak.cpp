@@ -89,9 +89,9 @@ void Datapak::load(const char* filename) {
         // First read the header
         fread(&chunks[x].header, sizeof(chunks[x].header), 1, file);
         // Then the data
-        chunks[x].data = new char[chunks[x].header.baseSize];
-        fread(chunks[x].data, chunks[x].header.baseSize, 1, file);
-        // NOTE: Remember to free all aloocated data
+        chunks[x].data = new char[chunks[x].header.compSize];
+        fread(chunks[x].data, chunks[x].header.compSize, 1, file);
+        // NOTE: Remember to free all allocated data
     }
     //== Finally close the file and save the filename for later
     LOG("Loaded all chunks!");
