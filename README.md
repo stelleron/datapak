@@ -1,7 +1,7 @@
 # Datapak -  A lightweight C++ packaging library
 
 ## Summary
-Datapak is a C++ library that is designed with simplicity in mind to package and compress files into a single .datapak file (file extension can be renamed). Datapak uses the DEFLATE algorithm to compress data and requires only the 'datapak.hpp' and 'datapak.cpp' files along with the DEFLATE headers.
+Datapak is a C++ library that is designed with simplicity in mind to package and compress files into a single .datapak file (file extension can be renamed). Datapak uses the DEFLATE algorithm to compress data and requires only the `datapak.hpp` and `datapak.cpp` files along with the DEFLATE headers.
 
 ## Setup
 Datapak is included with a premake5.lua file to build it, as well as the Makefiles. If you wish to make the project, just simply install it from GitHub, and have GNU make install. Then, use the terminal to open the project and simply just type `make`.
