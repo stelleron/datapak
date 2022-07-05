@@ -1,5 +1,3 @@
-Makefile
-datapak.make
 test.make
 bin/
 .vscode/
@@ -8,6 +6,7 @@ re.sh
 all.sh
 run.sh
 commit.sh
+comp.sh
 comptest.make
 wren/
 cache/
