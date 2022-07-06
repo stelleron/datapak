@@ -21,7 +21,6 @@ T* compressData(const T* data, int size, int* compSize) {
     int bounds = sdefl_bound(size);
     T* compData = new T[bounds];
     *compSize = sdeflate(&sdefl, compData, data, size, COMP_QUALITY);
-    std::cout << "SYSTEM: Compress data: Original size: " << size << " -> Comp. size: " << *compSize << std::endl;
     return compData;
 }
 
@@ -32,10 +31,9 @@ T* decompressData(const T* compData, int compSize, int* size) {
     T* buffer = (T*)realloc(data, length);
 
     if (buffer != NULL) data = buffer;
-    else LOG("SYSTEM: Failed to re-allocate required decompression memory");
+    else LOG("Failed to re-allocate required decompression memory");
 
     *size = length;
-    std::cout << "SYSTEM: Decompress data: Comp. size: " << compSize << " -> Original size: " << *size << std::endl;
     return data;
 }
 

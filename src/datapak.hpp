@@ -37,8 +37,8 @@
             int ptr; // Used to set a pointer when finding a datapak
         public:
             Datapak(); // Default constructor
-            Datapak(const char* filepath); // Load the datapak
-            void load(const char* filepath);
+            Datapak(const char* filepath); 
+            void load(const char* filepath); // Load the datapak
             ~Datapak();
 
             bool find(const char* alias); // Find whether the given file exists in the datapak
@@ -54,7 +54,6 @@
             void list(); // List all files stored in the datapak
 
             void purge(); // Reset the datapak (USE VERY CAREFULLY!)
-            void close(); // Close the file
-
+            void close(); // Close the file¯
     };
 #endif
