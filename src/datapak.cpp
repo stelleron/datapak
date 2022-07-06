@@ -21,6 +21,7 @@ T* compressData(const T* data, int size, int* compSize) {
     int bounds = sdefl_bound(size);
     T* compData = new T[bounds];
     *compSize = sdeflate(&sdefl, compData, data, size, COMP_QUALITY);
+    std::cout << "SYSTEM: Compress data: Original size: " << size << " -> Comp. size: " << *compSize << std::endl;
     return compData;
 }
 
@@ -34,6 +35,7 @@ T* decompressData(const T* compData, int compSize, int* size) {
     else LOG("SYSTEM: Failed to re-allocate required decompression memory");
 
     *size = length;
+    std::cout << "SYSTEM: Decompress data: Comp. size: " << compSize << " -> Original size: " << *size << std::endl;
     return data;
 }
 
@@ -172,6 +174,13 @@ std::string Datapak::read(const char* alias) {
         FIND_ERROR;
         return 0;
     }    
+}
+
+unsigned char* Datapak::readBytes(const char* alias) {
+    std::string readStr = read(alias);
+    unsigned char* source = new unsigned char[chunks[ptr].header.baseSize];
+    strcpy((char*)source, readStr.c_str());
+    return source;
 }
 
 void Datapak::close() {

@@ -47,6 +47,7 @@
 
             void write(const char* alias, const std::string& data); // Compress & write given data to the datapak
             std::string read(const char* alias); // Decompress & read data from the datapak 
+            unsigned char* readBytes(const char* alias); // Decompress & read the bytes of a file from the datapak
 
             void remove(const char* alias); // Remove data under a given alias 
             void rename(const char* alias, const char* new_alias); // Rename a file under a given alias

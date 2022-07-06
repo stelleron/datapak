@@ -19,33 +19,9 @@ const unsigned int SCR_HEIGHT = 600;
 int main()
 {
     Datapak dat;
-    dat.load("gl.dat");
+    dat.load("gl.dat"); 
 
-        std::string vertexCode;
-        std::string fragmentCode;
-        std::ifstream vShaderFile;
-        std::ifstream fShaderFile;
-         // open files
-        vShaderFile.open("/Users/donti/Desktop/stelleron/datapak/4.1.texture.vs");
-        fShaderFile.open("/Users/donti/Desktop/stelleron/datapak/4.1.frag.fs");
-        std::stringstream vShaderStream, fShaderStream;
-        // read file's buffer contents into streams
-        vShaderStream << vShaderFile.rdbuf();
-        fShaderStream << fShaderFile.rdbuf();
-        // close file handlers
-        vShaderFile.close();
-        fShaderFile.close();
-        // convert stream into string
-        vertexCode   = vShaderStream.str();
-        fragmentCode = fShaderStream.str();
 
-    dat.write("vertex.shader", vertexCode);
-    dat.write("fragment.shader", fragmentCode);
-    std::cout << dat.read("vertex.shader") << std::endl;
-    std::cout << std::endl;
-    std::cout << dat.read("fragment.shader") << std::endl;
-    std::cout << std::endl;
-    
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -79,7 +55,9 @@ int main()
 
     // build and compile our shader zprogram
     // ------------------------------------
-    Shader ourShader("/Users/donti/Desktop/stelleron/datapak/4.1.texture.vs", "/Users/donti/Desktop/stelleron/datapak/4.1.frag.fs"); 
+    std::string vertSrc = dat.read("vertex.shader");
+    std::string fragSrc = dat.read("fragment.shader");
+    Shader ourShader(vertSrc, fragSrc); 
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -131,8 +109,12 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load image, create texture and generate mipmaps
     int width, height, nrChannels;
+    unsigned char* imageContent = dat.readBytes("image");
+
     // The FileSystem::getPath(...) is part of the GitHub repository so we can find files on any IDE/platform; replace it with your own image path.
-    unsigned char *data = stbi_load("/Users/donti/Desktop/stelleron/datapak/bin/container.jpg", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load_from_memory(imageContent, dat.getBaseSize("image"), &width, &height, &nrChannels, 0);
+    delete[] imageContent;
+
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);

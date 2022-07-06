@@ -1,0 +1,27 @@
+    dat.purge();
+            std::string vertexCode;
+            std::string fragmentCode;
+            std::string imgData;
+            std::ifstream vShaderFile;
+            std::ifstream fShaderFile;
+            std::ifstream imgFile;
+            // open files
+            vShaderFile.open("/Users/donti/Desktop/stelleron/datapak/4.1.texture.vs");
+            fShaderFile.open("/Users/donti/Desktop/stelleron/datapak/4.1.frag.fs");
+            imgFile.open("/Users/donti/Desktop/stelleron/datapak/bin/container.jpg");
+            std::stringstream vShaderStream, fShaderStream, imgStream;
+            // read file's buffer contents into streams
+            vShaderStream << vShaderFile.rdbuf() << '\0';
+            fShaderStream << fShaderFile.rdbuf() << '\0';
+            imgStream << imgFile.rdbuf() << '\0';
+            // close file handlers
+            vShaderFile.close();
+            fShaderFile.close();
+            imgFile.close();
+            // convert stream into string
+            vertexCode   = vShaderStream.str();
+            fragmentCode = fShaderStream.str();
+            imgData = imgStream.str();
+    dat.write("vertex.shader", vertexCode);
+    dat.write("fragment.shader", fragmentCode); 
+    dat.write("image", imgData);
